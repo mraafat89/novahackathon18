@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
                     mTextMessage.setText(R.string.title_home);
                     return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    //mTextMessage.setText(R.string.title_dashboard);
+                    mTextMessage.setText("Dashboard");
                     return true;
                 case R.id.navigation_notifications:
                     mTextMessage.setText(R.string.title_notifications);
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         editTextOrigin = (EditText) findViewById(R.id.editTextOrigin);
         editTextDstn = (EditText) findViewById(R.id.editTextDestn);
+
+        //MetroFareXML.main("E10","J03");
     }
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
