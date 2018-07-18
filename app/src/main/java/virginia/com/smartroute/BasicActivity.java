@@ -28,9 +28,7 @@ public class BasicActivity extends Activity {
     private Button buttonSearch;
     private EditText editTextOrigin;
     private EditText editTextDstn;
-<<<<<<< HEAD:app/src/main/java/virginia/com/smartroute/BasicActivity.java
     private List<SmartRoute> smartRoutes;
-=======
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
