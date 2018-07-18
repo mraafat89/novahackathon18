@@ -33,11 +33,11 @@ public class MetroFareXML {
 
 
 
-        public static void main(final String start, final String end) {
-            MetroFareXML mfx = new MetroFareXML();
-            mfx.start(start,end);
+     //   public static void main(final String start, final String end) {
+     //       MetroFareXML mfx = new MetroFareXML();
+      //      mfx.start(start,end);
 
-        }
+        //}
 
         public void start(final String start, final String end) {
 

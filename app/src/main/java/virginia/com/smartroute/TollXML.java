@@ -30,14 +30,14 @@ public class TollXML extends FragmentActivity {
     public List<String> startList = new ArrayList<>();
     public List<String> endList = new ArrayList<>();
 
-    protected void onCreate() {
+    public void CalculateTollsCost(String enter, String exit) {
         // Download current toll data
         mainTollTrip();
 
         // read XML
         mainXmlRead();
 
-        System.out.println("End : ");
+        //System.out.println("End : ");
 
     }
 
@@ -203,10 +203,6 @@ public class TollXML extends FragmentActivity {
         }*/
 
     }
-
-
-
-
 
     private static String getTagValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();

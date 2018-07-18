@@ -31,7 +31,9 @@ public class DirectionsJSONParser {
             /** Traversing all routes */
             for(int i=0;i<jRoutes.length();i++) {
                 /** Fill Create a smart route object*/
-                smartSegments.add(new SmartSegment((JSONObject) ((JSONObject) jRoutes.get(i)).getJSONArray("legs").get(0)));
+                jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+                for (int j = 0; j < jLegs.length(); j++) {
+                    smartSegments.add(new SmartSegment((JSONObject) ((JSONObject) jRoutes.get(i)).getJSONArray("legs").get(0)));
                /* jLegs = ( (JSONObject)jRoutes.get(i)).getJSONArray("legs");
                 List path = new ArrayList<HashMap<String, String>>();
 
@@ -57,10 +59,10 @@ public class DirectionsJSONParser {
                     routes.add(path);
                 }
             }*/
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        }catch (Exception e){
         }
 
         return smartSegments;

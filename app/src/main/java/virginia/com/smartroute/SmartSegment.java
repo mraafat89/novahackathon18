@@ -27,6 +27,9 @@ public class SmartSegment {
     public void setCost(double cost) {
         this.cost = cost;
     }
+    public void addCost(double cost) {
+        this.cost += cost;
+    }
 
     public double getCal() {
         return cal;
@@ -57,18 +60,26 @@ public class SmartSegment {
     private double cal;
     private double time;
     private double distance;
+    private List<Double> times;
+    private List<Double> distances;
     private List pathList;
-    private String mode;
+    private List<String> modes;
 
     public SmartSegment(JSONObject jLeg) {
+        times = new ArrayList<>();
+        modes = new ArrayList<>();
+        distances = new ArrayList<>();
         try {
             jSteps = ((JSONObject) jLeg).getJSONArray("steps");
             time = Double.parseDouble(String.valueOf(((JSONObject)jLeg.get("duration")).get("value")));
             distance = Double.parseDouble(String.valueOf(((JSONObject)jLeg.get("distance")).get("value"))) * 0.000621371;
             pathList = new ArrayList<HashMap<String, String>>();
             // get the mode of the first step, it will be the same for the whole segment
-            mode = ((JSONObject) jSteps.get(0)).get("travel_mode").toString();
+           // mode = ((JSONObject) jSteps.get(0)).get("travel_mode").toString();
             for (int k = 0; k < jSteps.length(); k++) {
+                modes.add(((JSONObject) jSteps.get(k)).get("travel_mode").toString());
+                distances.add(Double.parseDouble(((JSONObject)(((JSONObject) jSteps.get(k)).get("distance"))).get("value").toString())* 0.000621371);
+                times.add(Double.parseDouble(((JSONObject) (((JSONObject) jSteps.get(k)).get("duration"))).get("value").toString()));
                 String polyline = "";
                 polyline = (String) ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
                 List list = decodePoly(polyline);
@@ -79,6 +90,8 @@ public class SmartSegment {
                     pathList.add(hm);
                 }
             }
+            cost = 0;
+            cal = 0;
             calcCal();
             calcCost();
         }catch (JSONException e) {
@@ -120,30 +133,34 @@ public class SmartSegment {
         return poly;
     }
     private void calcCost(){
-        if(new String(mode).equals(new String("DRIVING"))) {
-            cost = 0.786090909 * distance ;
-            /// 1 m = 0.000621371 mile
-            /// cost per mile = $ 0.786090909
-        }
-        else if(new String(mode).equals(new String("BICYCLING"))) {
-            cost = 2;
-        }
-        else{
-            cost = 0;
+        boolean cycleFlag = false;
+        for(int i=0; i<modes.size(); i++) {
+            if (new String(modes.get(i)).equals(new String("DRIVING"))) {
+                cost += (0.786090909 * distances.get(i));
+                /// 1 m = 0.000621371 mile
+                /// cost per mile = $ 0.786090909
+            } else if (new String(modes.get(i)).equals(new String("BICYCLING"))) {
+                if(cycleFlag == false) {
+                    cost += 2;
+                    cycleFlag = true;
+                }
+            } else {
+                cost += 0;
+            }
         }
     }
     private void calcCal(){
-        if(new String(mode).equals(new String("DRIVING")) || new String(mode).equals(new String("TRANSIT"))) {
-            // driving or transit burns 85.4166 cal per hour
-            cal = 85.4166 * time /60/60 ;
-        }
-        else if(new String(mode).equals(new String("BICYCLING"))) {
-            cal = 54.1666 * 1000 *  distance;
-            // per mile biking is 54.1666 kcal/mile
-        }
-        else{
-            cal = 100 * distance;
-            // walking is 100 cal / mile
+        for(int i=0; i<modes.size(); i++) {
+            if (new String(modes.get(i)).equals(new String("DRIVING")) || new String(modes.get(i)).equals(new String("TRANSIT"))) {
+                // driving or transit burns 85.4166 cal per hour
+                cal += (85.4166 * times.get(i) / 60 / 60);
+            } else if (new String(modes.get(i)).equals(new String("BICYCLING"))) {
+                cal += (54.1666 * 1000 * distances.get(i));
+                // per mile biking is 54.1666 kcal/mile
+            } else {
+                cal += 100 * distances.get(i);
+                // walking is 100 cal / mile
+            }
         }
     }
 }

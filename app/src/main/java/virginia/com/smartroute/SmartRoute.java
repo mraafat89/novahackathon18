@@ -26,5 +26,8 @@ public class SmartRoute {
         risk += smartSegment.getRisk();
         distance += smartSegment.getDistance();
     }
+    public void addCost(double addition) {
+        cost+= addition;
+    }
 
 }
