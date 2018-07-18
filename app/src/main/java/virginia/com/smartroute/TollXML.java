@@ -2,7 +2,7 @@ package virginia.com.smartroute;
 
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
-
+import android.os.Environment;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,20 +24,29 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class TollXML extends FragmentActivity {
 
     public List<String> tollList = new ArrayList<>();
     public List<String> startList = new ArrayList<>();
     public List<String> endList = new ArrayList<>();
 
-    public void CalculateTollsCost(String enter, String exit) {
+
+    public String cost;
+
+
+
+    public Float CalculateTollsCost(String enter, String exit) {
         // Download current toll data
         mainTollTrip();
 
         // read XML
-        mainXmlRead();
+        Float c = mainXmlRead(enter,exit);
 
         //System.out.println("End : ");
+
+        return c;
 
     }
 
@@ -63,16 +72,33 @@ public class TollXML extends FragmentActivity {
 
         URL url = new URL(urlStr);
         BufferedInputStream bis = new BufferedInputStream(url.openStream());
-        //FileOutputStream fis = new FileOutputStream(file);
-        FileOutputStream fis = openFileOutput(file, Context.MODE_PRIVATE);
-        byte[] buffer = new byte[1024];
-        int count=0;
-        while((count = bis.read(buffer,0,1024)) != -1)
-        {
-            fis.write(buffer, 0, count);
+
+        try{
+            File path = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_ALARMS);
+
+            File fileObject = new File(path, "/" +file);
+            // if file doesnt exists, then create it
+            if (!fileObject.exists()) {
+                fileObject.createNewFile();
+            }
+            FileOutputStream fis = new FileOutputStream(fileObject);
+
+
+            //FileOutputStream fis = new FileOutputStream(filePath);
+            byte[] buffer = new byte[1024];
+            int count=0;
+            while((count = bis.read(buffer,0,1024)) != -1)
+            {
+                fis.write(buffer, 0, count);
+            }
+            fis.close();
+            bis.close();
         }
-        fis.close();
-        bis.close();
+       catch (Exception e) {
+           e.printStackTrace();
+       }
+
         //System.out.println("Hello");
 
     }
@@ -97,7 +123,8 @@ public class TollXML extends FragmentActivity {
 
 
 
-    public void mainXmlRead() {
+    public Float mainXmlRead(String en, String ex) {
+        Float tempCost = 0f;
 
         try {
             String filePath = "current_tolls.xml";
@@ -155,8 +182,18 @@ public class TollXML extends FragmentActivity {
                 }
             }
 
-            for (String toll : tollList) {
+            /*for (String toll : tollList) {
                 System.out.println(toll);
+            }*/
+
+            for(int i = 0; i < tollList.size(); i++) {
+                if (startList.get(i) == en) {
+                    if (endList.get(i) == ex){
+                        cost = tollList.get(i);
+                    }
+
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -201,6 +238,10 @@ public class TollXML extends FragmentActivity {
         } catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }*/
+        if(cost != "") {
+            tempCost = Float.valueOf(cost);
+        }
+        return tempCost;
 
     }
 

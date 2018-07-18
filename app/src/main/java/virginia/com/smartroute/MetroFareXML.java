@@ -33,13 +33,9 @@ public class MetroFareXML {
 
 
 
-     //   public static void main(final String start, final String end) {
-     //       MetroFareXML mfx = new MetroFareXML();
-      //      mfx.start(start,end);
 
-        //}
 
-        public void start(final String start, final String end) {
+        public Double mainFare(final String start, final String end) {
 
             new Thread(new Runnable() {
                 public void run() {
@@ -49,18 +45,14 @@ public class MetroFareXML {
 
                         URIBuilder builder = new URIBuilder("https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo");
 
-
                         builder.setParameter("FromStationCode", start);
                         builder.setParameter("ToStationCode", end);
-
 
                         URI uri = builder.build();
                         //HttpPostHC4 request = new HttpPostHC4(uri);
                         HttpGetHC4 request = new HttpGetHC4(uri);
                         request.setHeader("api_key", "ae7fb4a5bd5c45e18aad6936edad5965");
                         //builder.setParameter("api_key", "ae7fb4a5bd5c45e18aad6936edad5965");
-
-
                         //request.setHeader("api_key", "{}");
 
                         // Request body
@@ -101,6 +93,7 @@ public class MetroFareXML {
                     }
                 }
             }).start();
+            return peakFare;
         }
 
         public void SetVars(String s, String e, Double m, Double t, Double c, Double o, Double d) {
@@ -113,6 +106,8 @@ public class MetroFareXML {
             seniorFare = d;
 
         }
+
+
 
 
 }

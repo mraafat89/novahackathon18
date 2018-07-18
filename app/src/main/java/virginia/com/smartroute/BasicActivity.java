@@ -8,6 +8,9 @@ import android.widget.EditText;
 import android.util.Log;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.widget.SeekBar;
+import java.util.Collections;
+import  java.util.Comparator;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -31,10 +34,20 @@ public class BasicActivity extends Activity {
     private EditText editTextDstn;
     private List<SmartRoute> smartRoutes;
     static int counter = 0;
+    private SeekBar seekbarRisk, seekbarCost, seekbarTime, seekbarCal;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic);
+        seekbarRisk = (SeekBar) findViewById(R.id.seekBarRisk);
+        seekbarRisk.setProgress(0);
+        seekbarCost = (SeekBar) findViewById(R.id.seekBarCost);
+        seekbarCost.setProgress(0);
+        seekbarTime= (SeekBar) findViewById(R.id.seekBarTime);
+        seekbarTime.setProgress(5);
+        seekbarCal = (SeekBar) findViewById(R.id.seekBarCal);
+        seekbarCal.setProgress(10);
+
         ApiConfig apiConfig = new ApiConfig.Builder()
                 .setClientId("...")
                 .setClientToken("...")
@@ -113,12 +126,21 @@ public class BasicActivity extends Activity {
             if(counter==0) {
                 for (int i = 0; i < segments.size(); i++) {
                     if (i == 0 || i == 2) { // static tolls location
-                        ;//TODO cost =  tollXML.CalculateTollsCost("3110", "3130");
-                        segments.get(i).addCost(0.5);
+                        //float cost = 7.5;//  tollXML.CalculateTollsCost("3110", "3130");
+                        segments.get(i).addCost(7.5);
                     }
                     smartRoutes.add(new SmartRoute(segments.get(i)));
                     //add parking cost
                     smartRoutes.get(i).addCost(21);
+                    if(i ==0) {
+                        smartRoutes.get(i).setRisk(0.83);
+                        smartRoutes.get(i).setId(1);
+                    }else if(i == 1) {
+                        smartRoutes.get(i).setRisk(1);
+                        smartRoutes.get(i).setId(2);
+                    }
+                    else if(i == 2)
+                        smartRoutes.get(i).setRisk(0.89);
                 }
                 // Route Fastest Public Only
                 ///
@@ -132,24 +154,29 @@ public class BasicActivity extends Activity {
              if (counter ==1) {
                  SmartRoute smartRoute = new SmartRoute(segments.get(0));
                  smartRoutes.add(smartRoute);
-                // Route 2 origin to parking
+                 smartRoutes.get(smartRoutes.size()-1).setId(3);
+                 smartRoutes.get(smartRoutes.size()-1).setRisk(0.06);
+                 smartRoutes.get(smartRoutes.size()-1).addCost(12.3);
+                // Route 3 origin to parking
                  String url = getDirectionsUrl(new LatLng(38.958731 ,-77.356947), new LatLng(38.959571,-77.357274), "walking", "false", true);
                  BasicActivity.DownloadTask downloadTask = new BasicActivity.DownloadTask();
                  downloadTask.execute(url);
                  counter++;
                  return;
             }
-            // Route 2 Parking to Parking
+            // Route 3 Parking to Parking
             if (counter ==2) {
                 SmartRoute smartRoute = new SmartRoute(segments.get(0));
                 smartRoutes.add(smartRoute);
+                smartRoutes.get(smartRoutes.size()-1).setId(4);
+                smartRoutes.get(smartRoutes.size()-1).setRisk(0.82);
                 String url = getDirectionsUrl(new LatLng(38.959571 ,-77.357274), new LatLng(38.84401,-77.052395), "driving", "false", false);
                 BasicActivity.DownloadTask downloadTask = new BasicActivity.DownloadTask();
                 downloadTask.execute(url);
                 counter++;
                 return;
             }
-            // Route 2 parking to cycling
+            // Route 3 parking to cycling
             if (counter ==3) {
                 smartRoutes.get(smartRoutes.size() - 1).addSegment(segments.get(0));
                 String url = getDirectionsUrl(new LatLng(38.84401 ,-77.052395), new LatLng(38.842832,-77.050174), "walking", "false", true);
@@ -158,7 +185,7 @@ public class BasicActivity extends Activity {
                 counter++;
                 return;
             }
-            // Route 2 cycling to cycling
+            // Route 3 cycling to cycling
             if (counter ==4) {
                 smartRoutes.get(smartRoutes.size() - 1).addSegment(segments.get(0));
                 String url = getDirectionsUrl(new LatLng(38.842832 ,-77.050174), new LatLng(38.853303,-77.049611), "bicycling", "false", true);
@@ -167,7 +194,7 @@ public class BasicActivity extends Activity {
                 counter++;
                 return;
             }
-            // Route 2 cycling to destn
+            // Route 3 cycling to destn
             if (counter ==5) {
                 smartRoutes.get(smartRoutes.size() - 1).addSegment(segments.get(0));
                 String url = getDirectionsUrl(new LatLng(38.853303 ,-77.049611), new LatLng(38.853895,-77.049237), "walking", "false", true);
@@ -176,7 +203,7 @@ public class BasicActivity extends Activity {
                 counter++;
                 return;
             }
-            // Route 3 Most Calories Public
+            // Route 4 Most Calories Public
             // walk to bike
             if (counter ==6) {
                 smartRoutes.get(smartRoutes.size() - 1).addSegment(segments.get(0));
@@ -192,6 +219,9 @@ public class BasicActivity extends Activity {
             if (counter ==7) {
                 SmartRoute smartRoute = new SmartRoute(segments.get(0));
                 smartRoutes.add(smartRoute);
+                smartRoutes.get(smartRoutes.size()-1).setId(5);
+                smartRoutes.get(smartRoutes.size()-1).setRisk(0.05);
+                smartRoutes.get(smartRoutes.size()-1).addCost(10);
                 // bike to bike
                 String url = getDirectionsUrl(new LatLng(38.957225 ,-77.358128), new LatLng(38.948259,-77.338089), "bicycling", "false", true);
                 BasicActivity.DownloadTask downloadTask = new BasicActivity.DownloadTask();
@@ -229,7 +259,7 @@ public class BasicActivity extends Activity {
                 counter++;
                 return;
             }
-            // Route 3 walk to park
+            // Route 5 walk to park
             if (counter ==11) {
                 smartRoutes.get(smartRoutes.size() - 1).addSegment(segments.get(0));
                 // walk to bike
@@ -243,6 +273,8 @@ public class BasicActivity extends Activity {
             if (counter ==12) {
                 SmartRoute smartRoute = new SmartRoute(segments.get(0));
                 smartRoutes.add(smartRoute);
+                smartRoutes.get(smartRoutes.size()-1).setId(6);
+                smartRoutes.get(smartRoutes.size()-1).setRisk(0.80);
                 // drive
                 String url = getDirectionsUrl(new LatLng(38.959571 ,-77.357274), new LatLng(38.897688,-77.070637), "driving", "false", false);
                 BasicActivity.DownloadTask downloadTask = new BasicActivity.DownloadTask();
@@ -285,9 +317,26 @@ public class BasicActivity extends Activity {
                 smartRoutes.get(smartRoutes.size() - 1).addSegment(segments.get(0));
                 smartRoutes.get(smartRoutes.size() - 1).addCost(18);
                 counter++;
-
+                calculateRanks();
             }
         }
+    }
+    private void calculateRanks()
+    {
+
+        for (int i =0; i<smartRoutes.size(); i++)
+        {
+            smartRoutes.get(i).setScore(-(smartRoutes.get(i).getTime() * seekbarTime.getProgress()) +(smartRoutes.get(i).getCal() * seekbarCal.getProgress()));
+        }
+        List<SmartRoute> rankedRoutes = new ArrayList<>();
+        Collections.sort(smartRoutes, new Comparator<SmartRoute>() {
+            @Override
+            public int compare(SmartRoute lhs, SmartRoute rhs) {
+                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                return lhs.getScore() > rhs.getScore() ? -1 : (lhs.getScore() < rhs.getScore()) ? 1 : 0;
+            }
+        });
+
     }
     private String getDirectionsUrl(LatLng origin, LatLng dest, String mode, String alternatives, boolean tolls) {
 
