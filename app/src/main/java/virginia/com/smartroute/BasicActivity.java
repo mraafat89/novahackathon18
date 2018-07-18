@@ -28,7 +28,32 @@ public class BasicActivity extends Activity {
     private Button buttonSearch;
     private EditText editTextOrigin;
     private EditText editTextDstn;
+<<<<<<< HEAD:app/src/main/java/virginia/com/smartroute/BasicActivity.java
     private List<SmartRoute> smartRoutes;
+=======
+
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    //mTextMessage.setText(R.string.title_dashboard);
+                    mTextMessage.setText("Dashboard");
+                    return true;
+                case R.id.navigation_notifications:
+                    mTextMessage.setText(R.string.title_notifications);
+                    return true;
+            }
+            return false;
+        }
+    };
+>>>>>>> bb6054a53e8a43e791a11a730033c0ddfe096cae:app/src/main/java/virginia/com/smartroute/MainActivity.java
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +76,10 @@ public class BasicActivity extends Activity {
 
         editTextOrigin = (EditText) findViewById(R.id.editTextOrigin);
         editTextDstn = (EditText) findViewById(R.id.editTextDestn);
+
+        // Call metrofare function using start,end station
+        // output data is stored within string, double variables in metrofare script
+        //MetroFareXML.main("E10","J03");
     }
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
