@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
         editTextOrigin = (EditText) findViewById(R.id.editTextOrigin);
         editTextDstn = (EditText) findViewById(R.id.editTextDestn);
 
+        // Call metrofare function using start,end station
+        // output data is stored within string, double variables in metrofare script
         //MetroFareXML.main("E10","J03");
     }
     private class DownloadTask extends AsyncTask<String, Void, String> {
